@@ -11,6 +11,6 @@ class ApiScaffoldGenerator < Rails::Generators::NamedBase
     invoke "scaffold:api:model",      [ name ] + attrs
     invoke "scaffold:api:migration",  [ name ] + attrs
     invoke "scaffold:api:controller", [ name ] + attrs
-    invoke "scaffold:api:serializer", [ name ]
+    invoke "scaffold:api:serializer", [ name ] + attrs
   end
 end
