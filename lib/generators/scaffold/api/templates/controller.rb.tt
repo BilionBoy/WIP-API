@@ -6,34 +6,61 @@ module Api
       before_action :set_<%= singular_table_name %>, only: [:show, :update, :destroy]
 
       def index
-        @<%= plural_table_name %> = <%= class_name %>.all
-        render json: @<%= plural_table_name %>
+        query  = <%= class_name %>.ransack(params[:q])
+        result = paginate(
+          query.result.order(:id),
+          params[:per_page]
+        )
+
+        render_success(
+          data: result,
+          message: "<%= class_name.pluralize %> listados com sucesso"
+        )
       end
 
       def show
-        render json: @<%= singular_table_name %>
+        render_success(
+          data: @<%= singular_table_name %>,
+          message: "<%= class_name %> encontrado com sucesso"
+        )
       end
 
       def create
-        @<%= singular_table_name %> = <%= class_name %>.new(<%= singular_table_name %>_params)
-        if @<%= singular_table_name %>.save
-          render json: @<%= singular_table_name %>, status: :created
+        <%= singular_table_name %> = <%= class_name %>.new(<%= singular_table_name %>_params)
+
+        if <%= singular_table_name %>.save
+          render_success(
+            data: <%= singular_table_name %>,
+            message: "<%= class_name %> criado com sucesso",
+            status: :created
+          )
         else
-          render json: @<%= singular_table_name %>.errors, status: :unprocessable_entity
+          render_error(
+            message: "Erro ao criar <%= class_name.downcase %>",
+            errors: <%= singular_table_name %>.errors.full_messages
+          )
         end
       end
 
       def update
         if @<%= singular_table_name %>.update(<%= singular_table_name %>_params)
-          render json: @<%= singular_table_name %>
+          render_success(
+            data: @<%= singular_table_name %>,
+            message: "<%= class_name %> atualizado com sucesso"
+          )
         else
-          render json: @<%= singular_table_name %>.errors, status: :unprocessable_entity
+          render_error(
+            message: "Erro ao atualizar <%= class_name.downcase %>",
+            errors: @<%= singular_table_name %>.errors.full_messages
+          )
         end
       end
 
       def destroy
         @<%= singular_table_name %>.destroy
-        head :no_content
+        render_success(
+          message: "<%= class_name %> removido com sucesso"
+        )
       end
 
       private
@@ -41,11 +68,16 @@ module Api
       def set_<%= singular_table_name %>
         @<%= singular_table_name %> = <%= class_name %>.find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: "Not found" }, status: :not_found
+        render_error(
+          message: "<%= class_name %> não encontrado",
+          status: :not_found
+        )
       end
 
       def <%= singular_table_name %>_params
-        params.require(:<%= singular_table_name %>).permit(<%= attributes.map(&:name).join(", ") %>)
+        params
+          .require(:<%= singular_table_name %>)
+          .permit(<%= attributes.map { |a| ":#{a.name}" }.join(", ") %>)
       end
     end
   end
