@@ -12,5 +12,19 @@ class ApiScaffoldGenerator < Rails::Generators::NamedBase
     invoke "scaffold:api:migration",  [ name ] + attrs
     invoke "scaffold:api:controller", [ name ] + attrs
     invoke "scaffold:api:serializer", [ name ] + attrs
+
+    add_api_route
+  end
+
+  private
+
+  def add_api_route
+    route <<~RUBY
+      namespace :api do
+        namespace :v1 do
+          resources :#{file_name.pluralize}
+        end
+      end
+    RUBY
   end
 end
