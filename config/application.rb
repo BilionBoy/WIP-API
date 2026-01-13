@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "boot"
 require "rails/all"
 
@@ -5,15 +7,26 @@ Bundler.require(*Rails.groups)
 
 module Apirails
   class Application < Rails::Application
-    # Rails version.
     config.load_defaults 7.2
 
-    config.autoload_paths += %W[#{config.root}/lib]               # Adiciona diretórios ao autoload do Rails em desevolvimento
+    # ----------------------------
+    # Autoload / Zeitwerk
+    # ----------------------------
+    config.autoload_paths << Rails.root.join("lib")
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.time_zone = "La Paz"                                   # Configuração do Time Zone
-    config.i18n.default_locale = :'pt-BR'                         # Configuração do idioma padrão
+    # ----------------------------
+    # Generators (CRÍTICO)
+    # ----------------------------
+    # Isso é o que faz o override do scaffold funcionar
+    config.paths.add "lib/generators", eager_load: true
 
+    # ----------------------------
+    # App config
+    # ----------------------------
     config.api_only = true
+
+    config.time_zone = "La Paz"
+    config.i18n.default_locale = :"pt-BR"
   end
 end
