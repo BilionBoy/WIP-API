@@ -1,5 +1,26 @@
 # frozen_string_literal: true
 
+class Create<%= class_name.pluralize %> < ActiveRecord::Migration[<%= Rails::VERSION::MAJOR %>.<%= Rails::VERSION::MINOR %>]
+  def up
+    return if table_exists?(:<%= table_name %>)
+
+    create_table :<%= table_name %> do |t|
+<% attributes.each do |attribute| -%>
+      t.<%= attribute.type %> :<%= attribute.name %>
+<% end -%>
+      t.datetime :deleted_at
+      t.timestamps
+    end
+
+    add_index :<%= table_name %>, :deleted_at
+  end
+
+  def down
+    drop_table :<%= table_name %> if table_exists?(:<%= table_name %>)
+  end
+end
+# frozen_string_literal: true
+
 class Create<%= class_name.pluralize %> < ActiveRecord::Migration[6.0]
   def change
     create_table :<%= file_name.pluralize %> do |t|

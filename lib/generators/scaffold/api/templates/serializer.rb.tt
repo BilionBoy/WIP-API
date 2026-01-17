@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
 class <%= class_name %>Serializer < ActiveModel::Serializer
+  attributes :id,
+             <%= attributes.map { |a| ":#{a.name}" }.join(', ') %>,
+             :created_at,
+             :updated_at
+end
+# frozen_string_literal: true
+
+class <%= class_name %>Serializer < ActiveModel::Serializer
   attributes :id, <%= attributes.map { |a| ":#{a.name}" }.join(', ') %>
 end
